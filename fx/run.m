@@ -5,17 +5,17 @@ clear ; close all; clc
 fprintf('Loading and Visualizing Data ...\n')
 
 data = csvread('eurusd_t.csv');
-X = data(: , 2:size(data,2) - 1);
+X = data(: , 2:size(data,2) - 10);
 y = data(: , size(data,2));
 
 dataVal = csvread('eurusd_v.csv');
-XVal = dataVal(: , 2:size(data,2) - 1);
+XVal = dataVal(: , 2:size(data,2) - 10);
 yVal = dataVal(: , size(data,2));
 
-[X_n, mu, sigma] = featureNormalize(X);
-[XVal_n, mu, sigma] = featureNormalize(XVal);
+%[X_n, mu, sigma] = featureNormalize(X);
+%[XVal_n, mu, sigma] = featureNormalize(XVal);
 
-[C, sigma] = optimizeParams(X_n, y, XVal_n, yVal);
+[C, sigma] = optimizeParams(X, y, XVal, yVal);
 
 %% ==================== Part 2: Training Linear SVM ====================
 %  The following code will train a linear SVM on the dataset and plot the
