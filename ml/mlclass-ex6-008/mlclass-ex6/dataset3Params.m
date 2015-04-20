@@ -32,6 +32,7 @@ for i = 1:length(sample)
     model= svmTrain(X, y, sample(i), @(x1, x2) gaussianKernel(x1, x2, sample(j))); 
     predictions = svmPredict(model, Xval);
     cost = mean(double(predictions ~= yval));
+    fprintf('cost for C = %f sigma = %f is %f...\n', sample(i), sample(j), cost);
     if(cost < currentcost)
       currentcost = cost;
       C = sample(i);
