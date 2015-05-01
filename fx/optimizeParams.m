@@ -1,13 +1,13 @@
-function [C, sigma] = optimizeParams(X, y, XVal, yVal)
+function [C, sigma] = optimizeParams(X, y, XVal, yVal, C, sigma)
 
 %sample = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
 sample = [0.1];
 currentcost = 9999999999;
 
 for i = 1:length(sample)
-  C = 10;%sample(i);
+  %C = sample(i);
   for j = 1:length(sample)
-    sigma = 0.1;%ample(j);
+    %sigma = sample(j);
     y1 = y2 = y3 = zeros(length(y),1);
     y1(y==1) = 1;
     y2(y==-1) = 1;

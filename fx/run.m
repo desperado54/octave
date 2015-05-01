@@ -5,17 +5,30 @@ clear ; close all; clc
 fprintf('Loading and Visualizing Data ...\n')
 
 data = csvread('eurusd_t.csv');
-X = data(: , 2:size(data,2) - 10);
-y = data(: , size(data,2));
+y = data([1:100],4);
+x = [1:100];
+tP=findpeaksG(x,y,0,-1,5,1);
+tidx=int32(tP(:,2));
+flipy=10-y;
+bP=findpeaksG(x,flipy,0,-1,5,1);
+bidx=bP(:,2);
+sidx=sort(cat(1,tidx,bidx));
+plot(x,y,x(sidx),y(sidx),x(sidx),y(sidx),'.m');
+
+
+n = size(data,2);
+
+X = data(: , 8:15);
+y = data(: , n);
 
 dataVal = csvread('eurusd_v.csv');
-XVal = dataVal(: , 2:size(data,2) - 10);
-yVal = dataVal(: , size(data,2));
+XVal = dataVal(: , 8:15);
+yVal = dataVal(: , n);
 
-%[X_n, mu, sigma] = featureNormalize(X);
-%[XVal_n, mu, sigma] = featureNormalize(XVal);
+[X_n, mu, sigma] = featureNormalize(X);
+[XVal_n, mu, sigma] = featureNormalize(XVal);
 
-[C, sigma] = optimizeParams(X, y, XVal, yVal);
+[C, sigma] = optimizeParams(X_n, y, XVal_n, yVal, 3, 1);
 
 %% ==================== Part 2: Training Linear SVM ====================
 %  The following code will train a linear SVM on the dataset and plot the
