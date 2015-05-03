@@ -5,7 +5,7 @@ avg = 5;
 fibol1 = 0.382;
 
 data = csvread('eurusd_t.csv');
-for m = 1:200
+for m = 1:1
   start = 1+5*(m-1);
   y = data([start:wnd-1+start],4);
   x = [1:wnd]';
@@ -22,18 +22,36 @@ for m = 1:200
     ;%continue;
   endif
   trend = (y(sidx(2)) - y(sidx(1))) > 0;
-  dist = abs(y(sidx(2)) - y(sidx(1)));
-  vidx = [1,2];
+  %trend filtering
   count = length(sidx);
+  k=1;
+  trendidx=[1];
+  while(k < count-1)
+    trend = y(sidx(k+1)) - y(sidx(k)) > 0;
+    nexttrend = y(sidx(k+2)) - y(sidx(k+1)) > 0;
+    if(trend == nexttrend)
+      k++;
+    else
+      trendidx=[trendidx k+1];
+      k++;
+    endif
+  endwhile
+  trendidx=[trendidx count];
+  trendidx=sidx(trendidx);
+
+  
+  dist = abs(y(trendidx(2)) - y(trendidx(1)));
+  fiboidx = [1,2];
+  count = length(trendidx);
   i = 2;
   while(i < count)  
     j = i+1;
     while(j <= count)
-      nextdist = abs(y(sidx(j)) - y(sidx(i)));
+      nextdist = abs(y(trendidx(j)) - y(trendidx(i)));
       if(nextdist/dist < fibol1)
         j++;
       else
-        vidx = [vidx j];
+        fiboidx = [fiboidx j];
         i = j;
         dist = nextdist;
         break;
@@ -44,23 +62,9 @@ for m = 1:200
       endif  
     endwhile
   endwhile
-  vidx=sidx(vidx);
-  count = length(vidx);
-  k=1;
-  idx=[1];
-  while(k < count-1)
-    trend = y(vidx(k+1)) - y(vidx(k)) > 0;
-    nexttrend = y(vidx(k+2)) - y(vidx(k+1)) > 0;
-    if(trend == nexttrend)
-      k++;
-    else
-      idx=[idx k+1];
-      k++;
-    endif
-  endwhile
-  idx=[idx count];
-  idx=vidx(idx);
-  
+  fiboidx=trendidx(fiboidx);
+
+  idx = fiboidx;
 %idx = findCriticalPoints(x,y);
 plot(x,y,x(tidx),y(tidx),'oc',x(bidx),y(bidx),'+m',x(idx),y(idx));
 sleep(5);
