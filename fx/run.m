@@ -4,16 +4,28 @@ clear ; close all; clc
 
 fprintf('Loading and Visualizing Data ...\n')
 
+pkg load signal
+wnd = 100;
+avg = 5;
+
 data = csvread('eurusd_t.csv');
+%for i = 1:l00
 y = data([1:100],4);
-x = [1:100];
-tP=findpeaksG(x,y,0,-1,5,1);
+x = [1:100]';
+%y = imfilter(oy, fspecial('average', [avg 1]));
+%skipped = int32(avg/2);
+%y = y(skipped : wnd - skipped);
+%x = x(skipped : wnd - skipped);
+tP=findpeaksG(x,y,0,-1,5,3,1);
 tidx=int32(tP(:,2));
-flipy=10-y;
-bP=findpeaksG(x,flipy,0,-1,5,1);
-bidx=bP(:,2);
+flipy=2-y;
+%bP=findvalleys(x,y,0,-1,5,5,1);
+bP=findpeaksG(x,flipy,0,-1,5,3,1);
+bidx=int32(bP(:,2));
+bidxp=bidx > 0;
+bidx = bidx(bidxp);
 sidx=sort(cat(1,tidx,bidx));
-plot(x,y,x(sidx),y(sidx),x(sidx),y(sidx),'.m');
+plot(x,y,x(tidx),y(tidx),'oc',x(bidx),y(bidx),'+m',x(sidx),y(sidx));
 
 
 n = size(data,2);
