@@ -1,13 +1,10 @@
-function [idx] = findCriticalPoints(x,y)
-  tP=findpeaksG(x,y,0,-1,5,5,1);
-  tidx=int32(tP(:,2));
-  flipy=1.7-y;
-  %bP=findvalleys(x,y,0,-1,5,5,1);
-  bP=findpeaksG(x,flipy,0,-1,5,5,1);
-  bidx=int32(bP(:,2));
-  bidxp=bidx > 0;
-  bidx = bidx(bidxp);
-  sidx=sort(cat(1,tidx,bidx));
+function [tidx,bidx,idx] = findCriticalPoints(x,y)
+  avg = 5;
+  fibol1 = 0.382;
+  [tpks tidx] = findpeaks(y,"MinPeakDistance",7,"MinPeakWidth",2);
+  flipy=2-y;
+  [bpks bidx] = findpeaks(flipy,"MinPeakDistance",7,"MinPeakWidth",2);
+  sidx=sort(cat(1,tidx',bidx'));
   if(length(sidx) < 2)
     ;%continue;
   endif
@@ -35,19 +32,22 @@ function [idx] = findCriticalPoints(x,y)
     endwhile
   endwhile
   vidx=sidx(vidx);
+  
+  %plot(x,y,x(sidx),y(sidx),'oc',"markersize", 20, x(vidx),y(vidx),'*r',"markersize", 30, x(vidx),y(vidx),"linewidth",2,"color","k");
+
   count = length(vidx);
-  i=1;
+  k=1;
   idx=[1];
-  while(i < count-1)
-    trend = y(vidx(i+1)) - y(vidx(i)) > 0;
-    nexttrend = y(vidx(i+2)) - y(vidx(i+1)) > 0;
+  while(k < count-1)
+    trend = y(vidx(k+1)) - y(vidx(k)) > 0;
+    nexttrend = y(vidx(k+2)) - y(vidx(k+1)) > 0;
     if(trend == nexttrend)
-      i++;
+      k++;
     else
-      idx=[idx i+1];
-      i++;
+      idx=[idx k+1];
+      k++;
     endif
   endwhile
   idx=[idx count];
   idx=vidx(idx);
-end
+endfunction

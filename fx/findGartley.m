@@ -2,10 +2,9 @@ pkg load signal
 wnd = 210;
 avg = 5;
 
-fibol1 = 0.382;
 
 data = csvread('eurusd_t.csv');
-for m = 1:1
+for m = 3:3
   start = 1+5*(m-1);
   y = data([start:wnd-1+start],4);
   x = [1:wnd]';
@@ -14,59 +13,12 @@ for m = 1:1
   %y = y(skipped : wnd - skipped);
   %x = x(skipped : wnd - skipped);
 
-  [tpks tidx] = findpeaks(y,"MinPeakDistance",3);
-  flipy=2-y;
-  [bpks bidx] = findpeaks(flipy,"MinPeakDistance",3);
-  sidx=sort(cat(1,tidx',bidx'));
-  if(length(sidx) < 2)
-    ;%continue;
-  endif
-  trend = (y(sidx(2)) - y(sidx(1))) > 0;
-  %trend filtering
-  count = length(sidx);
-  k=1;
-  trendidx=[1];
-  while(k < count-1)
-    trend = y(sidx(k+1)) - y(sidx(k)) > 0;
-    nexttrend = y(sidx(k+2)) - y(sidx(k+1)) > 0;
-    if(trend == nexttrend)
-      k++;
-    else
-      trendidx=[trendidx k+1];
-      k++;
-    endif
-  endwhile
-  trendidx=[trendidx count];
-  trendidx=sidx(trendidx);
-
+[tidx,bidx,idx]=findCriticalPoints(x,y);
   
-  dist = abs(y(trendidx(2)) - y(trendidx(1)));
-  fiboidx = [1,2];
-  count = length(trendidx);
-  i = 2;
-  while(i < count)  
-    j = i+1;
-    while(j <= count)
-      nextdist = abs(y(trendidx(j)) - y(trendidx(i)));
-      if(nextdist/dist < fibol1)
-        j++;
-      else
-        fiboidx = [fiboidx j];
-        i = j;
-        dist = nextdist;
-        break;
-      endif
-      if(j > count)
-        i=j;
-        break;
-      endif  
-    endwhile
-  endwhile
-  fiboidx=trendidx(fiboidx);
-
-  idx = fiboidx;
 %idx = findCriticalPoints(x,y);
-plot(x,y,x(tidx),y(tidx),'oc',x(bidx),y(bidx),'+m',x(idx),y(idx));
+%plot(x,y,x(tidx),y(tidx),'oc',x(bidx),y(bidx),'+m',x(idx),y(idx));
+plot(x,y,x(tidx),y(tidx),'oc',"markersize", 15, x(bidx),y(bidx),'*r',"markersize", 15, x(idx),y(idx),"linewidth",2,"color","r");
+
 sleep(5);
 endfor
 
